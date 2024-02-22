@@ -1,5 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+<style>
+#style {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#style td, #style th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#style tr:nth-child(even){background-color: #dedafd;}
+
+#style tr:hover {background-color: #f5f7ff;}
+
+#style th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #6794f3;
+  color: rgb(255, 255, 255);
+}
+
+</style>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,10 +34,10 @@
     <title>Status</title>
 </head>
 <body>
-    <h1>Lazyloader Status</h1>
-    <h2>Active Containers</h2>
-    <p>This are containers the lazyloader knows about and considers "active"</p>
-    <table>
+    <h1 id="style">Lazyloader Status</h1>
+    <h2 id="style">Active Containers</h2>
+    <p id="style">This are containers the lazyloader knows about and considers "active"</p>
+    <table id="style">
         <tr>
             <th>Name</th>
             <th>Started</th>
@@ -32,9 +58,9 @@
         {{end}}
     </table>
 
-    <h2>Qualifying Containers</h2>
-    <p>These are all containers that qualify to be lazy-loader managed</p>
-    <table>
+    <h2 id="style">Qualifying Containers</h2>
+    <p id="style">These are all containers that qualify to be lazy-loader managed</p>
+    <table id="style">
         <tr>
             <th>Name</th>
             <th>State</th>
@@ -55,9 +81,9 @@
         {{end}}
     </table>
 
-    <h2>Provider Containers</h2>
-    <p>These are all containers that act as dependencies for other containers</p>
-    <table>
+    <h2 id="style">Provider Containers</h2>
+    <p id="style">These are all containers that act as dependencies for other containers</p>
+    <table id="style">
         <tr>
             <th>Name</th>
             <th>State</th>
@@ -78,7 +104,7 @@
         {{end}}
     </table>
 
-    <h2>Runtime</h2>
-    <p>{{.RuntimeMetrics}}</p>
+    <h2 id="style">Runtime</h2>
+    <p id="style">{{.RuntimeMetrics}}</p>
 </body>
 </html>
