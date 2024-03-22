@@ -53,7 +53,8 @@
   }
 }
 body {
-  background: #1fbeca;
+  background: #95b1fc;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 * {
@@ -70,7 +71,7 @@ body {
 
 .message {
   margin: 16px;
-  color: #333;
+  color: #fdfdfd;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
   text-align: center;
 }
