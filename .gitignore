@@ -3,3 +3,13 @@ traefik-lazyload
 
 # Various testing/compose files
 *compose.yml
+
+# Node.js dependencies (for semantic-release)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs
+*.log
