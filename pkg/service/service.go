@@ -88,8 +88,12 @@ func (s *Core) StartHost(hostname string) (*ContainerState, error) {
 			ets.lastActivity = time.Now()
 			s.mux.Unlock()
 		}()
-		s.startDependencyFor(ctx, ets.needs, ct.NameID())
-		s.startContainerSync(ctx, ct)
+		if err := s.startDependencyFor(ctx, ets.needs, ct.NameID()); err != nil {
+			logrus.Errorf("Failed to start dependencies for %s: %v", ct.NameID(), err)
+		}
+		if err := s.startContainerSync(ctx, ct); err != nil {
+			logrus.Errorf("Failed to start container %s: %v", ct.NameID(), err)
+		}
 	}()
 
 	return ets, nil
@@ -146,13 +150,14 @@ func (s *Core) startDependencyFor(ctx context.Context, needs []string, forContai
 	for _, dep := range needs {
 		providers, err := s.discovery.FindDepProvider(ctx, dep)
 
-		if err != nil {
+		switch {
+		case err != nil:
 			logrus.Errorf("Error finding dependency provider for %s: %v", dep, err)
 			return err
-		} else if len(providers) == 0 {
+		case len(providers) == 0:
 			logrus.Warnf("Unable to find any container that provides %s for %s", dep, forContainer)
 			return ErrProviderNotFound
-		} else {
+		default:
 			for _, provider := range providers {
 				if !provider.IsRunning() {
 					logrus.Infof("Starting dependency for %s: %s", forContainer, provider.NameID())
@@ -311,7 +316,11 @@ func (s *Core) checkContainerForInactivity(ctx context.Context, cid string, ct *
 	if err != nil {
 		return false, err
 	}
-	defer statsStream.Body.Close()
+	defer func() {
+		if closeErr := statsStream.Body.Close(); closeErr != nil {
+			logrus.Warnf("Error closing stats stream for container %s: %v", cid, closeErr)
+		}
+	}()
 
 	var stats container.StatsResponse
 	if err := json.NewDecoder(statsStream.Body).Decode(&stats); err != nil {
