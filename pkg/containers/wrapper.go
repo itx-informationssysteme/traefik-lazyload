@@ -8,13 +8,13 @@ import (
 	"time"
 	"traefik-lazyload/pkg/config"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/sirupsen/logrus"
 )
 
 // Wrapper for container results that opaques and adds some methods to that data
 type Wrapper struct {
-	types.Container
+	container.Summary
 }
 
 // Human-consumable name + ID
@@ -100,11 +100,11 @@ func (s *Wrapper) ConfigDuration(sublabel string, dflt time.Duration) (time.Dura
 
 // true if state is running
 func (s *Wrapper) IsRunning() bool {
-	return s.State == "running"
+	return s.State == container.StateRunning
 }
 
 // Wrap a container set
-func wrapContainers(cts ...types.Container) []Wrapper {
+func wrapContainers(cts ...container.Summary) []Wrapper {
 	ret := make([]Wrapper, len(cts))
 	for i, c := range cts {
 		ret[i] = Wrapper{c}
@@ -115,6 +115,6 @@ func wrapContainers(cts ...types.Container) []Wrapper {
 	return ret
 }
 
-func wrapListResult(cts []types.Container, err error) ([]Wrapper, error) {
+func wrapListResult(cts []container.Summary, err error) ([]Wrapper, error) {
 	return wrapContainers(cts...), err
 }

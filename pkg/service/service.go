@@ -10,7 +10,6 @@ import (
 	"traefik-lazyload/pkg/config"
 	"traefik-lazyload/pkg/containers"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/sirupsen/logrus"
@@ -134,7 +133,7 @@ func (s *Core) startContainerSync(ctx context.Context, ct *containers.Wrapper) e
 		return nil
 	}
 
-	if err := s.client.ContainerStart(ctx, ct.ID, types.ContainerStartOptions{}); err != nil {
+	if err := s.client.ContainerStart(ctx, ct.ID, container.StartOptions{}); err != nil {
 		logrus.Warnf("Error starting container %s: %s", ct.NameID(), err)
 		return err
 	} else {
@@ -312,8 +311,9 @@ func (s *Core) checkContainerForInactivity(ctx context.Context, cid string, ct *
 	if err != nil {
 		return false, err
 	}
+	defer statsStream.Body.Close()
 
-	var stats types.StatsJSON
+	var stats container.StatsResponse
 	if err := json.NewDecoder(statsStream.Body).Decode(&stats); err != nil {
 		return false, err
 	}

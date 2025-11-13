@@ -5,7 +5,7 @@ import (
 	"strings"
 	"traefik-lazyload/pkg/config"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 )
 
@@ -26,7 +26,7 @@ func (s *Discovery) ProviderContainers(ctx context.Context) ([]Wrapper, error) {
 	filters := filters.NewArgs()
 	filters.Add("label", config.SubLabel("provides"))
 
-	return wrapListResult(s.client.ContainerList(ctx, types.ContainerListOptions{
+	return wrapListResult(s.client.ContainerList(ctx, container.ListOptions{
 		Filters: filters,
 		All:     true,
 	}))
@@ -36,7 +36,7 @@ func (s *Discovery) FindAllLazyload(ctx context.Context, includeStopped bool) ([
 	filters := filters.NewArgs()
 	filters.Add("label", config.Model.LabelPrefix)
 
-	return wrapListResult(s.client.ContainerList(ctx, types.ContainerListOptions{
+	return wrapListResult(s.client.ContainerList(ctx, container.ListOptions{
 		All:     includeStopped,
 		Filters: filters,
 	}))
@@ -70,7 +70,7 @@ func (s *Discovery) FindContainerByHostname(ctx context.Context, hostname string
 func (s *Discovery) FindDepProvider(ctx context.Context, name string) ([]Wrapper, error) {
 	filters := filters.NewArgs()
 	filters.Add("label", config.SubLabel("provides")+"="+name)
-	return wrapListResult(s.client.ContainerList(ctx, types.ContainerListOptions{
+	return wrapListResult(s.client.ContainerList(ctx, container.ListOptions{
 		Filters: filters,
 		All:     true,
 	}))
