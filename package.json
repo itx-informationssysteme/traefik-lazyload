@@ -19,7 +19,7 @@
     "semantic-release": "^25.0.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "volta": {
     "node": "22.21.1",
