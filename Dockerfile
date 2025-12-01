@@ -64,4 +64,4 @@ WORKDIR /opt/src
 EXPOSE 8080 40000
 
 # Build the binary with debug info and run with dlv exec
-CMD ["sh", "-c", "CGO_ENABLED=1 go build -buildvcs=false -gcflags='all=-N -l' -o /tmp/traefik-lazyload . && dlv exec /tmp/traefik-lazyload --headless --listen=:40000 --api-version=2 --accept-multiclient --log"]
+CMD ["sh", "-c", "CGO_ENABLED=0 go build -buildvcs=false -gcflags='all=-N -l' -o /tmp/traefik-lazyload . && dlv exec /tmp/traefik-lazyload --headless --listen=:40000 --api-version=2 --accept-multiclient --continue --log"]
