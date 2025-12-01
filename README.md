@@ -1,7 +1,9 @@
 # traefik-lazyloader
 
-This small app will automatically start and stop docker containers based on access, for instance,
-via traefik.
+This small app will automatically start and stop docker containers based on access, for instance, via traefik.
+
+This is a modified version of the [original traefik-lazyload](https://github.com/zix99/traefik-lazyload) project.  
+Changes include: Docker API upgrade, GitHub Actions workflow updates, and bug fixes.
 
 ## How it Works
 
@@ -23,51 +25,59 @@ version: '3.5'
 services:
   # Example traefik proxy (Don't need if you already have something set up!)
   reverse-proxy:
-    image: traefik:v2.4
+    image: traefik:3
     command:
-      - --api.insecure
-      - --providers.docker
-      - --providers.docker.defaultRule=Host(`{{.Name}}.example.com`)
-      - --entryPoints.web.address=:80
-      - --entryPoints.web.forwardedHeaders.insecure
-      - --providers.docker.exposedByDefault=false
+      - "--global.checknewversion=false"
+      - "--global.sendanonymoususage=false"
+      - "--log=true"
+      - "--log.level=INFO"
+      - "--entrypoints.http=true"
+      - "--entrypoints.http.address=:80"
+      - "--providers.docker"
+      - "--providers.docker.watch=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--tracing=true"
+      - "--accesslog=true"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
     restart: always
     ports:
       - "80:80"     # The HTTP port
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
+      - ./.docker/traefik/acme.json:/acme.json
+      - ./.docker/traefik/config_norobots.yaml:/etc/traefik/config_norobots.yaml:ro
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
 
   # Lazy-loader manager
   lazyloader:
     #build: . # Uncomment to build from source
-    image: ghcr.io/zix99/traefik-lazyload:1
+    image: ghcr.io/itx-informationssysteme/traefik-lazyload:latest
     labels:
       - traefik.enable=true
       - "traefik.http.routers.lazyload.priority=-100" # Lower router priority. Would only be hit if the app isn't running
-      - "traefik.http.routers.lazyload.rule=Host(`whoami.example.com`, `lazyloader.example.com`)"
+      # Traefik v2
+      # - "traefik.http.routers.lazyload.rule=Host(`whoami.example.com`, `lazyloader.example.com`)"
+      # Traefik v3
+      - "traefik.http.routers.lazyload.rule=HostRegexp(`^[\\w\\d-]+\\.example\\.com$`)"
+      - "traefik.http.routers.lazyload.entrypoints=http"
+      - "traefik.http.services.lazyload.loadbalancer.server.port=8080"
     environment:
       TLL_STOPATBOOT: true                   # Stop all lazyloaded containers at boot (great for an example)
       TLL_STATUSHOST: lazyloader.example.com # This hostname will display a status page. Disabled by default
-    networks:
-      - traefik-bridge
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # Must access docker
 
   whoami:
     image: containous/whoami
-    networks:
-      - traefik-bridge
+    restart: unless-stopped
     labels:
       - traefik.enable=true
       - "traefik.http.routers.lazywhoami.rule=Host(`whoami.example.com`)"
+      - "traefik.http.routers.webserver.priority=-50"
+      - "traefik.http.services.webserver.loadbalancer.server.port=80"
       - lazyloader=true
       - lazyloader.stopdelay=30s # Overrides the default
-
-networks:
-  traefik-bridge:
-    external: true
-    name: traefik-bridge
 ```
 
 You can run `docker-compose up` on the above for a quick-start. You will need to alter the domains as needed.
@@ -121,7 +131,11 @@ Use these on containers you want to be lazy-loaded.
 
 # License
 
-Copyright (C) 2023  Christopher LaPointe
+Copyright (C) 2023  Christopher LaPointe  
+Copyright (C) 2025  ITX Informationssysteme (modifications)
+
+This is a modified version of the original traefik-lazyload project.  
+Changes include: Docker API upgrade, GitHub Actions workflow updates, and bug fixes.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
