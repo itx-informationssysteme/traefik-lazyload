@@ -28,7 +28,10 @@
         "dockerImage": "ghcr.io/${GITHUB_REPOSITORY}",
         "dockerRegistry": "ghcr.io",
         "dockerProject": "${GITHUB_REPOSITORY}",
-        "dockerFile": "Dockerfile"
+        "dockerFile": "Dockerfile",
+        "dockerBuildFlags": {
+          "target": "prod"
+        }
       }
     ],
     [

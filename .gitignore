@@ -1,8 +1,10 @@
 # Binary
 traefik-lazyload
+__debug_bin*
 
 # Various testing/compose files
 *compose.yml
+!docker-compose.yml
 
 # Node.js dependencies (for semantic-release)
 node_modules/
