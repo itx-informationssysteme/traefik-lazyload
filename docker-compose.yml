@@ -1,0 +1,69 @@
+services:
+  webserver:
+    image: nginxdemos/hello:latest
+    restart: no
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webserver.rule=Host(`webserver.itxnet.local`)"
+      - "traefik.http.services.webserver.loadbalancer.server.port=80"
+      - lazyloader.stopdelay=10s
+      - lazyloader=true
+
+  traefik:
+    image: traefik:3
+    restart: no
+    command:
+      - "--global.checknewversion=false"
+      - "--global.sendanonymoususage=false"
+      - "--log=true"
+      - "--log.level=INFO"
+      - "--entrypoints.http=true"
+      - "--entrypoints.http.address=:80"
+      - "--providers.docker"
+      - "--providers.docker.watch=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--tracing=true"
+      - "--accesslog=true"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+    ports:
+      - 80:80
+      - 8080:8080
+    volumes:
+      - "./.docker/traefik/acme.json:/acme.json"
+      - "./.docker/traefik/config_norobots.yaml:/etc/traefik/config_norobots.yaml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`localhost`)"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.tls=false"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "traefik.http.routers.traefik.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=testing-environment:$$2y$$05$$xISag1qOnsIvMj09YeJfX.cBcClzQJlwvOKTGkBbvLWi1eUmnxJQK"
+
+  lazyloader:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: debug
+    restart: no
+    working_dir: /opt/src
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lazyload.priority=-100"
+      - "traefik.http.routers.lazyload.rule=HostRegexp(`^[\\w\\d-]+\\.itxnet\\.local$`)"
+      - "traefik.http.routers.lazyload.entrypoints=http"
+      - "traefik.http.services.lazyload.loadbalancer.server.port=8080"
+    environment:
+      TLL_STOPATBOOT: true
+      TLL_STATUSHOST: lazyloader.itxnet.local
+      TLL_TIMEOUT: 30s
+      TLL_VERBOSE: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Must access docker
+      - .:/opt/src # For debugging - source is mounted for live editing
+      - ./config.yaml:/opt/src/config.yaml:ro
+    ports:
+      - 40000:40000 # Debugging port

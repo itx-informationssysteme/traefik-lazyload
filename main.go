@@ -91,6 +91,7 @@ func main() {
 }
 
 func (s *controller) ContainerHandler(w http.ResponseWriter, r *http.Request) {
+	logrus.Debugf("Handle request for host: %s %s", r.Host, r.URL)
 	host := r.Host
 	if host == "" {
 		w.WriteHeader(http.StatusNotFound)
