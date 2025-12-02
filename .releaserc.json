@@ -25,7 +25,8 @@
           "{{major}}",
           "latest"
         ],
-        "dockerImage": "{{env.GITHUB_REPOSITORY}}",
+        "dockerImage": "traefik-lazyload",
+        "dockerProject": "itx-informationssysteme",
         "dockerRegistry": "ghcr.io",
         "dockerFile": "Dockerfile",
         "dockerBuildFlags": {
