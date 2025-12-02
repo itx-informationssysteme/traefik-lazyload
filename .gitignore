@@ -15,3 +15,6 @@ yarn-error.log*
 # Logs
 logs
 *.log
+
+# IDE and editor files
+.idea/

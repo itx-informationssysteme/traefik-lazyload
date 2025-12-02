@@ -25,9 +25,8 @@
           "{{major}}",
           "latest"
         ],
-        "dockerImage": "ghcr.io/${GITHUB_REPOSITORY}",
+        "dockerImage": "${GITHUB_REPOSITORY}",
         "dockerRegistry": "ghcr.io",
-        "dockerProject": "${GITHUB_REPOSITORY}",
         "dockerFile": "Dockerfile",
         "dockerBuildFlags": {
           "target": "prod"
