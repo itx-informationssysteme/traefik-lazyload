@@ -57,6 +57,7 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           DOCKER_REGISTRY_USER: ${{ github.actor }}
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
           DOCKER_REGISTRY_URL: ${{ env.REGISTRY }}
