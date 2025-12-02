@@ -28,7 +28,7 @@ COPY . .
 
 # Build with NO optimizations so debugging works
 # CGO_ENABLED=1 is required for Delve to properly map source files
-RUN CGO_ENABLED=1 GOOS=linux go build \
+RUN CGO_ENABLED=0 GOOS=linux go build \
     -buildvcs=false \
     -gcflags "all=-N -l" \
     -o traefik-lazyload .
@@ -54,14 +54,15 @@ CMD ["./traefik-lazyload"]
 # =========================
 FROM golang:1.24-alpine AS debug
 
-RUN apk add --no-cache ca-certificates bash gcc git libc-dev && \
+RUN apk add --no-cache bash ca-certificates gcc git libc-dev && \
     go install github.com/go-delve/delve/cmd/dlv@latest
 
 WORKDIR /opt/src
 
-# COPY --from=build-debug /opt/src/traefik-lazyload .
+COPY --from=build-debug /opt/src/traefik-lazyload /tmp/traefik-lazyload
+COPY config.yaml .
 
 EXPOSE 8080 40000
 
 # Build the binary with debug info and run with dlv exec
-CMD ["sh", "-c", "CGO_ENABLED=0 go build -buildvcs=false -gcflags='all=-N -l' -o /tmp/traefik-lazyload . && dlv exec /tmp/traefik-lazyload --headless --listen=:40000 --api-version=2 --accept-multiclient --continue --log"]
+CMD ["dlv", "exec", "/tmp/traefik-lazyload", "--headless", "--listen=:40000", "--api-version=2", "--accept-multiclient", "--continue", "--log"]
