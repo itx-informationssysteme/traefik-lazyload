@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/itx-informationssysteme/traefik-lazyload/compare/v2.0.0...v2.1.0) (2025-12-03)
+
+
+### Features
+
+* **containers:** match hostnames from Traefik Host/HostRegexp rules ([ffd319c](https://github.com/itx-informationssysteme/traefik-lazyload/commit/ffd319c241bb86e83c757b214f3a2036ef7718f4))
+
 # [2.0.0](https://github.com/itx-informationssysteme/traefik-lazyload/compare/v1.0.0...v2.0.0) (2025-12-02)
 
 
