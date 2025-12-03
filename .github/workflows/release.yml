@@ -3,8 +3,6 @@ name: Build and Publish Docker Image
 on:
   push:
     branches: [ master, main ]
-  pull_request:
-    branches: [ master, main ]
 
 env:
   REGISTRY: ghcr.io
@@ -24,8 +22,6 @@ jobs:
   docker:
     runs-on: ubuntu-24.04
     needs: [lint, test]
-    # Only run on push to master/main or when PR is merged to master/main
-    if: (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')) || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'main'))
     
     permissions:
       contents: write
